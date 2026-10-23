@@ -1,0 +1,77 @@
+{
+  "schemaVersion": "1.0",
+  "codes": [
+    {
+      "code": "ENERGOV_SOURCE_OF_TRUTH",
+      "title": "Current fee data",
+      "text": "This estimate uses fee data from EnerGov. Current assessed charges may differ.",
+      "severity": "information"
+    },
+    {
+      "code": "ESTIMATE_NOT_INVOICE",
+      "title": "Estimate only",
+      "text": "This is an estimate, not an invoice or a guarantee of final charges.",
+      "severity": "information"
+    },
+    {
+      "code": "CONFIGURATION_AS_OF_DATE",
+      "title": "Fee data date",
+      "text": "Fees and calculation rules may have changed after the date shown with the estimate.",
+      "severity": "information"
+    },
+    {
+      "code": "HISTORICAL_OCCURRENCE_NOT_REQUIREMENT",
+      "title": "Past permit records",
+      "text": "Past records show what appeared on similar permits. They do not determine whether a fee or related permit is required.",
+      "severity": "information"
+    },
+    {
+      "code": "LOW_SAMPLE",
+      "title": "Limited history",
+      "text": "The historical sample is small, so the observed occurrence rate may not be representative.",
+      "severity": "caution"
+    },
+    {
+      "code": "INPUT_REQUIRED",
+      "title": "More project information needed",
+      "text": "This fee cannot be calculated until the required project information is entered.",
+      "severity": "information"
+    },
+    {
+      "code": "MANUAL_REVIEW",
+      "title": "Staff review needed",
+      "text": "Staff must review project information or make a decision before this fee can be determined.",
+      "severity": "staff-review"
+    },
+    {
+      "code": "UNSUPPORTED_RULE",
+      "title": "Staff calculation needed",
+      "text": "The tool cannot calculate this fee. No amount is included.",
+      "severity": "staff-review"
+    },
+    {
+      "code": "EVENT_CONTINGENT",
+      "title": "Fee may apply later",
+      "text": "This fee may apply only if a later event occurs, such as a failed inspection or reinspection.",
+      "severity": "caution"
+    },
+    {
+      "code": "REPEATABLE_FEE",
+      "title": "Fee may be charged more than once",
+      "text": "This fee may be charged again if the event occurs again.",
+      "severity": "caution"
+    },
+    {
+      "code": "RELATED_PERMIT_SCOPE_DEPENDENT",
+      "title": "Possible related permit",
+      "text": "Whether this related permit is needed depends on project type and scope.",
+      "severity": "caution"
+    },
+    {
+      "code": "RELATED_PERMIT_REVIEW_DETERMINED",
+      "title": "May be identified during review",
+      "text": "The need for this related permit may be determined during plan or permit review.",
+      "severity": "caution"
+    }
+  ]
+}

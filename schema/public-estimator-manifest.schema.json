@@ -1,0 +1,70 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raleighnc.gov/schemas/permit-fee-estimator/public-manifest-v1.schema.json",
+  "title": "Public permit fee estimator manifest",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaVersion",
+    "catalogVersion",
+    "generatedAtUtc",
+    "configurationAsOfDate",
+    "historyMinimumSampleSize",
+    "options"
+  ],
+  "properties": {
+    "schemaVersion": {
+      "const": "public-1.0"
+    },
+    "catalogVersion": {
+      "type": "string",
+      "minLength": 1
+    },
+    "generatedAtUtc": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "configurationAsOfDate": {
+      "type": "string",
+      "format": "date"
+    },
+    "historyMinimumSampleSize": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "options": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "optionKey",
+          "permitType",
+          "workClass",
+          "path"
+        ],
+        "properties": {
+          "optionKey": {
+            "type": "string",
+            "pattern": "^o[0-9]{3,}$"
+          },
+          "permitType": {
+            "type": "string",
+            "minLength": 1
+          },
+          "workClass": {
+            "type": "string",
+            "minLength": 1
+          },
+          "path": {
+            "type": "string",
+            "pattern": "^options/o[0-9]{3,}\\.json$"
+          }
+        }
+      }
+    }
+  }
+}

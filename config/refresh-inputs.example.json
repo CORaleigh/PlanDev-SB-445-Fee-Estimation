@@ -1,0 +1,20 @@
+{
+  "schemaVersion": "1.0",
+  "baselineSnapshot": "local-data/permit_fee_templates_clean.json",
+  "inspectionTemplates": "local-data/inspection_fee_templates_clean.json",
+  "inspectionValidation": "local-data/inspection_fee_rule_validation.json",
+  "inspectionFeeMap": "local-data/inspection_fee_map.csv",
+  "historicalUsage": "local-data/permit_fee_usage_patterns.json",
+  "historicalFeeDetail": "local-data/permit_family_fee_detail.csv",
+  "historicalCohort": "local-data/permit_family_cohort.csv",
+  "fixedFeeBehavior": "local-data/fixed-fee/fixed_fee_behavior_summary.csv",
+  "choiceLabels": "local-data/choice-labels/result-01.csv",
+  "inputPrevalence": [
+    "local-data/electrical-prevalence/result-02.csv",
+    "local-data/building_accessory_input_prevalence.csv",
+    "local-data/row_occupancy_input_prevalence.csv"
+  ],
+  "assessmentEvidence": [
+    "local-data/fee-assessment/result-02.csv"
+  ]
+}

@@ -1,0 +1,86 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Permit fee estimate</title>
+<link rel="icon" type="image/x-icon" href="./images/favicon.ico">
+<link rel="icon" type="image/png" sizes="32x32" href="./images/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="./images/favicon-16x16.png">
+<link rel="apple-touch-icon" sizes="180x180" href="./images/apple-touch-icon.png">
+<link rel="manifest" href="./images/site.webmanifest">
+<link rel="stylesheet" href="./styles.css">
+</head>
+<body>
+<main>
+<header class="site-header">
+<img class="site-logo" src="./images/raleigh_horizontal.png" alt="City of Raleigh">
+<div>
+<h1>Permit fee estimate</h1>
+<p class="subtitle">Estimate initial permit fees based on current project information.</p>
+</div>
+</header>
+
+<section id="stakeholder-preview" class="stakeholder-preview" role="note" hidden>
+  <strong id="stakeholder-preview-heading"></strong>
+  <p id="stakeholder-preview-message"></p>
+</section>
+
+<section class="option-picker">
+<label class="field">
+<span>Permit type</span>
+<select id="permit-type"></select>
+</label>
+<label class="field">
+<span>Work class</span>
+<select id="work-class"></select>
+</label>
+</section>
+
+<div id="runtime-notice" class="notice" role="status" aria-live="polite" aria-atomic="true"></div>
+
+<section>
+<div id="project-inputs">
+<div class="project-input-header">
+<h2>Project details</h2>
+<div class="project-input-actions">
+<div id="group-actions" class="group-actions" hidden>
+<button id="expand-all-groups" class="link-button" type="button">Expand all</button>
+<button id="collapse-all-groups" class="link-button" type="button">Collapse all</button>
+</div>
+<label id="frequency-control" class="frequency-toggle" hidden>
+<input id="show-frequency" type="checkbox">
+<span>Show percentages from past permits</span>
+</label>
+<label id="related-permit-control" class="frequency-toggle" hidden>
+<input id="show-related-permits" type="checkbox">
+<span>Show related permits</span>
+</label>
+</div>
+</div>
+<p id="input-prevalence-help" class="input-evidence-help" hidden>For each project detail, the percentage shows how often issued or finalized permits of this type had a positive amount or selected answer. These percentages do not show what is required for this project.</p>
+<div id="project-controls" class="controls"></div>
+<div id="related-permits-panel" class="related-permits-panel" hidden>
+<h3>Related permits</h3>
+<p class="input-evidence-help">These percentages show how often related permits appeared with similar past projects. They do not mean that a related permit or fee is required. Related permit fees are not included in the estimate.</p>
+<div id="related-permits"></div>
+</div>
+</div>
+<button id="calculate" type="button" disabled>Calculate estimate</button>
+<p id="error" class="error" role="alert" hidden></p>
+</section>
+
+<section id="results" aria-labelledby="results-heading" tabindex="-1" hidden>
+<h2 id="results-heading">Estimate</h2>
+<div id="status" class="notice" role="status" aria-live="polite" aria-atomic="true"></div>
+<div id="total" class="total" aria-live="polite" aria-atomic="true"></div>
+<div id="estimate-limitations"></div>
+<div id="estimate-inputs"></div>
+<div id="calculated-fees"></div>
+<div id="review-items"></div>
+</section>
+<p id="source-note" class="source-note" hidden><em></em></p>
+</main>
+<script type="module" src="./app.js"></script>
+</body>
+</html>

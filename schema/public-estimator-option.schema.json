@@ -1,0 +1,184 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raleighnc.gov/schemas/permit-fee-estimator/public-option-v1.schema.json",
+  "title": "Public permit fee estimator option",
+  "description": "Reduced data used by the static estimator. The complete internal catalog remains the source for refresh review and PDF generation.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaVersion",
+    "catalogVersion",
+    "configuration",
+    "option",
+    "ui",
+    "fees",
+    "relatedPermits",
+    "disclosures"
+  ],
+  "properties": {
+    "schemaVersion": {
+      "const": "public-1.0"
+    },
+    "catalogVersion": {
+      "type": "string",
+      "minLength": 1
+    },
+    "configuration": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "asOfDate",
+        "historicalPeriod"
+      ],
+      "properties": {
+        "asOfDate": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "historicalPeriod": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "startDate",
+            "endDate"
+          ],
+          "properties": {
+            "startDate": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "endDate": {
+              "type": [
+                "string",
+                "null"
+              ]
+            }
+          }
+        }
+      }
+    },
+    "option": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "optionKey",
+        "permitTypeKey",
+        "permitType",
+        "workClassKey",
+        "workClass"
+      ],
+      "properties": {
+        "optionKey": {
+          "type": "string",
+          "pattern": "^o[0-9]{3,}$"
+        },
+        "permitTypeKey": {
+          "type": "string",
+          "pattern": "^t[0-9]{3,}$"
+        },
+        "permitType": {
+          "type": "string",
+          "minLength": 1
+        },
+        "workClassKey": {
+          "type": "string",
+          "pattern": "^w[0-9]{3,}$"
+        },
+        "workClass": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "ui": {
+      "type": "object",
+      "required": [
+        "controls",
+        "presentation",
+        "uiBlockers",
+        "blockingRuntimeDiagnostics",
+        "runtimeReady",
+        "displayReady"
+      ]
+    },
+    "fees": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "feeTemplateFeeId",
+          "name",
+          "section",
+          "assessmentRole",
+          "applicability",
+          "calculation"
+        ],
+        "properties": {
+          "feeTemplateFeeId": {
+            "type": "string",
+            "pattern": "^f[0-9]{4,}$"
+          },
+          "estimationReview": {
+            "type": "string",
+            "minLength": 1
+          },
+          "name": {
+            "type": "string"
+          },
+          "section": {
+            "type": "string"
+          },
+          "assessmentRole": {
+            "type": "string"
+          },
+          "applicability": {
+            "type": "object"
+          },
+          "calculation": {
+            "type": "object"
+          },
+          "category": {
+            "type": "string"
+          },
+          "disposition": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "relatedPermits": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "permitType",
+          "workClass",
+          "relationshipFamily",
+          "historyBasis",
+          "history",
+          "fees"
+        ]
+      }
+    },
+    "disclosures": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "code"
+        ],
+        "properties": {
+          "code": {
+            "type": "string",
+            "minLength": 1
+          }
+        }
+      }
+    }
+  }
+}

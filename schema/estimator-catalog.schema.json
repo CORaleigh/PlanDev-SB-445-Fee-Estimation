@@ -1,0 +1,821 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raleighnc.gov/schemas/permit-fee-estimator/catalog-option-v1.schema.json",
+  "title": "Permit fee estimator option",
+  "description": "Complete internal data for one permit type and work class. The static site uses a separate reduced format.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaVersion",
+    "catalogVersion",
+    "generatedAtUtc",
+    "configuration",
+    "option",
+    "requiredInputs",
+    "fees",
+    "relatedPermits",
+    "disclosures",
+    "validation"
+  ],
+  "properties": {
+    "schemaVersion": {
+      "const": "1.0"
+    },
+    "catalogVersion": {
+      "type": "string",
+      "minLength": 1
+    },
+    "generatedAtUtc": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "configuration": {
+      "$ref": "#/$defs/configuration"
+    },
+    "option": {
+      "$ref": "#/$defs/permitOption"
+    },
+    "requiredInputs": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/input"
+      }
+    },
+    "inputPrevalence": {
+      "type": "array",
+      "items": {"$ref": "#/$defs/inputPrevalence"}
+    },
+    "choiceContext": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["layoutId", "fields"],
+      "properties": {
+        "layoutId": {"type": ["string", "null"]},
+        "fields": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["key", "fieldId", "active", "multiple", "choices"],
+            "properties": {
+              "key": {"type": "string"},
+              "fieldId": {"type": ["string", "null"]},
+              "label": {"type": "string"},
+              "active": {"type": "boolean"},
+              "multiple": {"type": "boolean"},
+              "choices": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": ["value", "label"],
+                  "properties": {
+                    "value": {"type": "string", "minLength": 1},
+                    "label": {"type": ["string", "null"]}
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "fees": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/fee"
+      }
+    },
+    "relatedPermits": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/relatedPermit"
+      }
+    },
+    "disclosures": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/disclosure"
+      }
+    },
+    "validation": {
+      "$ref": "#/$defs/validation"
+    }
+  },
+  "$defs": {
+    "assessmentRole": {
+      "enum": ["standalone-or-assessed", "dependency-and-assessed", "dependency-only", "dependency-unresolved"]
+    },
+    "assessmentEvidence": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["role", "isCalculationDependency", "referencedByFeeIds", "explicitHiddenMarker",
+                   "directAssessmentEvidence", "historicalDenominator", "directAssessmentEvidenceSource", "basis"],
+      "properties": {
+        "role": {"$ref": "#/$defs/assessmentRole"},
+        "isCalculationDependency": {"type": "boolean"},
+        "referencedByFeeIds": {"type": "array", "items": {"type": "string"}},
+        "explicitHiddenMarker": {"type": "boolean"},
+        "directAssessmentEvidence": {"type": "string"},
+        "historicalDenominator": {"type": "integer", "minimum": 0},
+        "directAssessmentEvidenceSource": {"type": "string"},
+        "basis": {"type": "string"}
+      }
+    },
+    "inputPrevalence": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["inputKey", "inputLabel", "status", "denominatorName", "denominator",
+                   "populatedRows", "populatedRate", "activeRows", "activeRate", "activeDefinition",
+                   "valueKind", "sourceKind", "sourceColumn", "physicalColumnFound", "basis", "sourceFile"],
+      "properties": {
+        "inputKey": {"type": "string", "minLength": 1},
+        "inputLabel": {"type": "string"},
+        "status": {"enum": ["available", "unavailable"]},
+        "denominatorName": {"type": "string"},
+        "denominator": {"type": ["integer", "null"], "minimum": 0},
+        "populatedRows": {"type": ["integer", "null"], "minimum": 0},
+        "populatedRate": {"type": ["number", "null"], "minimum": 0, "maximum": 1},
+        "activeRows": {"type": ["integer", "null"], "minimum": 0},
+        "activeRate": {"type": ["number", "null"], "minimum": 0, "maximum": 1},
+        "activeDefinition": {"type": "string"},
+        "valueKind": {"type": "string"},
+        "sourceKind": {"type": "string"},
+        "sourceColumn": {"type": "string"},
+        "physicalColumnFound": {"type": "boolean"},
+        "basis": {"const": "direct-input-prevalence-query"},
+        "sourceFile": {"type": "string"}
+      }
+    },
+    "nullableString": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "configuration": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "environment",
+        "asOfDate",
+        "sourceAuthority",
+        "sources",
+        "historicalPeriod"
+      ],
+      "properties": {
+        "environment": {
+          "type": "string",
+          "enum": [
+            "prod",
+            "train"
+          ]
+        },
+        "asOfDate": {
+          "type": "string",
+          "format": "date"
+        },
+        "sourceAuthority": {
+          "const": "EnerGov"
+        },
+        "sources": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "$ref": "#/$defs/source"
+          }
+        },
+        "historicalPeriod": {
+          "$ref": "#/$defs/period"
+        }
+      }
+    },
+    "source": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "kind",
+        "name"
+      ],
+      "properties": {
+        "kind": {
+          "type": "string",
+          "enum": [
+            "permit-template",
+            "inspection-template",
+            "historical-fee-detail",
+            "historical-family-cohort",
+            "validated-rule",
+            "staff-review",
+            "fixed-fee-behavior",
+            "condition-choice-labels",
+            "direct-input-prevalence",
+            "direct-fee-assessment-evidence"
+          ]
+        },
+        "name": {
+          "type": "string",
+          "minLength": 1
+        },
+        "schemaVersion": {
+          "$ref": "#/$defs/nullableString"
+        },
+        "asOfDate": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "format": "date"
+        },
+        "sha256": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "pattern": "^[A-Fa-f0-9]{64}$"
+        }
+      }
+    },
+    "period": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "basis",
+        "startDate",
+        "endDate"
+      ],
+      "properties": {
+        "basis": {
+          "const": "ParentAppliedDate"
+        },
+        "startDate": {
+          "type": "string",
+          "format": "date"
+        },
+        "endDate": {
+          "type": "string",
+          "format": "date"
+        }
+      }
+    },
+    "permitOption": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "optionKey",
+        "permitTypeId",
+        "permitType",
+        "workClassId",
+        "workClass"
+      ],
+      "properties": {
+        "optionKey": {
+          "type": "string",
+          "minLength": 1
+        },
+        "permitTypeId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "permitType": {
+          "type": "string",
+          "minLength": 1
+        },
+        "workClassId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "workClass": {
+          "type": "string",
+          "minLength": 1
+        },
+        "feeTemplateId": {
+          "$ref": "#/$defs/nullableString"
+        },
+        "feeTemplate": {
+          "$ref": "#/$defs/nullableString"
+        }
+      }
+    },
+    "input": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "key",
+        "label",
+        "valueType",
+        "required",
+        "usedByFeeKeys"
+      ],
+      "properties": {
+        "key": {
+          "type": "string",
+          "minLength": 1
+        },
+        "label": {
+          "type": "string",
+          "minLength": 1
+        },
+        "valueType": {
+          "type": "string",
+          "enum": [
+            "currency",
+            "number",
+            "integer",
+            "boolean",
+            "choice",
+            "text",
+            "unknown"
+          ]
+        },
+        "source": {
+          "type": "string",
+          "enum": [
+            "custom-field",
+            "fee",
+            "system",
+            "unknown"
+          ]
+        },
+        "entryMode": {
+          "type": "string",
+          "enum": [
+            "user",
+            "derived",
+            "system",
+            "review"
+          ]
+        },
+        "unit": {
+          "$ref": "#/$defs/nullableString"
+        },
+        "required": {
+          "type": "boolean"
+        },
+        "choices": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "minimum": {
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "maximum": {
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "usedByFeeKeys": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "fee": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "feeKey",
+        "name",
+        "section",
+        "applicability",
+        "calculation",
+        "occurrence",
+        "repeat",
+        "sources",
+        "validation"
+      ],
+      "properties": {
+        "feeKey": {
+          "type": "string",
+          "minLength": 1
+        },
+        "feeTemplateFeeId": {
+          "$ref": "#/$defs/nullableString"
+        },
+        "feeId": {
+          "$ref": "#/$defs/nullableString"
+        },
+        "feeTypeId": {"type": ["integer", "string", "null"]},
+        "feeType": {"type": ["integer", "string", "null"]},
+        "sourceTemplateId": {"$ref": "#/$defs/nullableString"},
+        "sourceTemplate": {"$ref": "#/$defs/nullableString"},
+        "templateRelationship": {"$ref": "#/$defs/nullableString"},
+        "assessmentRole": {"$ref": "#/$defs/assessmentRole"},
+        "assessmentEvidence": {"$ref": "#/$defs/assessmentEvidence"},
+        "estimationReview": {
+          "type": "string",
+          "minLength": 1
+        },
+        "name": {
+          "type": "string",
+          "minLength": 1
+        },
+        "description": {
+          "$ref": "#/$defs/nullableString"
+        },
+        "section": {
+          "type": "string",
+          "enum": [
+            "configured",
+            "input-required",
+            "conditional",
+            "event-contingent",
+            "manual-review",
+            "inactive"
+          ]
+        },
+        "applicability": {
+          "$ref": "#/$defs/applicability"
+        },
+        "calculation": {
+          "$ref": "#/$defs/calculation"
+        },
+        "occurrence": {
+          "$ref": "#/$defs/occurrence"
+        },
+        "repeat": {
+          "$ref": "#/$defs/repeat"
+        },
+        "sources": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "string"
+          }
+        },
+        "validation": {
+          "$ref": "#/$defs/validation"
+        }
+      }
+    },
+    "applicability": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "status",
+        "explanation",
+        "conditions"
+      ],
+      "properties": {
+        "status": {
+          "type": "string",
+          "enum": [
+            "configured",
+            "conditional",
+            "event-contingent",
+            "manual-review",
+            "inactive"
+          ]
+        },
+        "explanation": {
+          "type": "string",
+          "minLength": 1
+        },
+        "conditions": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/condition"
+          }
+        }
+      }
+    },
+    "condition": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "kind",
+        "description",
+        "supported"
+      ],
+      "properties": {
+        "scope": {"enum": ["fee", "template"]},
+        "kind": {
+          "type": "string",
+          "enum": [
+            "input",
+            "status",
+            "workflow",
+            "inspection",
+            "child-template",
+            "expression",
+            "other"
+          ]
+        },
+        "description": {
+          "type": "string",
+          "minLength": 1
+        },
+        "supported": {
+          "type": "boolean"
+        },
+        "sourceRule": {}
+      }
+    },
+    "calculation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "mode",
+        "amountStatus",
+        "currency",
+        "inputKeys"
+      ],
+      "properties": {
+        "mode": {
+          "type": "string",
+          "enum": [
+            "fixed",
+            "input",
+            "formula",
+            "tiered",
+            "surcharge",
+            "manual",
+            "unsupported"
+          ]
+        },
+        "amountStatus": {
+          "type": "string",
+          "enum": [
+            "calculable",
+            "needs-input",
+            "manual-review",
+            "unsupported",
+            "not-applicable"
+          ]
+        },
+        "currency": {
+          "const": "USD"
+        },
+        "fixedAmount": {
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "formulaDisplay": {
+          "$ref": "#/$defs/nullableString"
+        },
+        "rounding": {
+          "$ref": "#/$defs/nullableString"
+        },
+        "minimumAmount": {
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "maximumAmount": {
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "inputKeys": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "rule": {}
+      }
+    },
+    "occurrence": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "status"
+      ],
+      "properties": {
+        "status": {
+          "type": "string",
+          "enum": [
+            "available",
+            "insufficient-sample",
+            "unavailable",
+            "not-applicable"
+          ]
+        },
+        "numerator": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "minimum": 0
+        },
+        "denominator": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "minimum": 0
+        },
+        "rate": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "minimum": 0,
+          "maximum": 1
+        },
+        "period": {
+          "oneOf": [
+            {
+              "$ref": "#/$defs/period"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "denominatorDefinition": {
+          "$ref": "#/$defs/nullableString"
+        },
+        "sampleWarning": {
+          "$ref": "#/$defs/nullableString"
+        }
+      }
+    },
+    "repeat": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "repeatable",
+        "basis"
+      ],
+      "properties": {
+        "repeatable": {
+          "type": [
+            "boolean",
+            "null"
+          ]
+        },
+        "basis": {
+          "type": "string",
+          "enum": [
+            "configuration",
+            "historical",
+            "event",
+            "unknown",
+            "not-applicable"
+          ]
+        },
+        "trigger": {
+          "$ref": "#/$defs/nullableString"
+        },
+        "averageInstancesPerChargedFamily": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "minimum": 0
+        }
+      }
+    },
+    "relatedPermit": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "relatedPermitKey",
+        "relationshipFamily",
+        "permitType",
+        "workClass",
+        "evidence",
+        "occurrence",
+        "requiredInputs",
+        "fees",
+        "disclosureCodes"
+      ],
+      "properties": {
+        "relatedPermitKey": {
+          "type": "string",
+          "minLength": 1
+        },
+        "relationshipFamily": {
+          "type": "string",
+          "minLength": 1
+        },
+        "permitTypeId": {
+          "$ref": "#/$defs/nullableString"
+        },
+        "permitType": {
+          "type": "string",
+          "minLength": 1
+        },
+        "workClassId": {
+          "$ref": "#/$defs/nullableString"
+        },
+        "workClass": {
+          "type": "string",
+          "minLength": 1
+        },
+        "configuredOptionKey": {
+          "$ref": "#/$defs/nullableString"
+        },
+        "configuredOptionPath": {
+          "$ref": "#/$defs/nullableString"
+        },
+        "activeFeeOccurrence": {"$ref": "#/$defs/occurrence"},
+        "evidence": {
+          "type": "string",
+          "enum": [
+            "configured",
+            "historical",
+            "configured-and-historical"
+          ]
+        },
+        "occurrence": {
+          "$ref": "#/$defs/occurrence"
+        },
+        "requiredInputs": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/input"
+          }
+        },
+        "fees": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/fee"
+          }
+        },
+        "disclosureCodes": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "disclosure": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "code",
+        "title",
+        "text",
+        "severity"
+      ],
+      "properties": {
+        "code": {
+          "type": "string",
+          "pattern": "^[A-Z][A-Z0-9_]*$"
+        },
+        "title": {
+          "type": "string",
+          "minLength": 1
+        },
+        "text": {
+          "type": "string",
+          "minLength": 1
+        },
+        "severity": {
+          "type": "string",
+          "enum": [
+            "information",
+            "caution",
+            "staff-review"
+          ]
+        }
+      }
+    },
+    "validation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "status",
+        "codes"
+      ],
+      "properties": {
+        "status": {
+          "type": "string",
+          "enum": [
+            "validated",
+            "partially-validated",
+            "unvalidated",
+            "blocked"
+          ]
+        },
+        "codes": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "notes": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,41 @@
+# Credentials and local configuration
+.env
+.env.*
+!.env.example
+config/refresh-inputs.json
+
+# Local source data and generated output
+local-data/
+output/
+output-prod/
+logs/
+*.log
+
+# Python environments and generated files
+env/
+.venv/
+venv/
+__pycache__/
+*.py[cod]
+*.egg-info/
+.pytest_cache/
+.coverage
+htmlcov/
+build/
+dist/
+
+# Credentials and private-key material
+*.key
+*.pem
+*.p12
+*.pfx
+
+# Local analysis files
+*.pbix
+*.pkl
+
+# Editor and operating-system files
+.idea/
+.vscode/
+.DS_Store
+Thumbs.db
