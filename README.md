@@ -163,11 +163,13 @@ audience and the downloadable JSON content have been approved.
 
 ## Draft Fee-Schedule PDFs
 
-Generate one draft from the retained internal data, not `docs/data/`.
-Replace `PATH\TO\INTERNAL-DATA` with the folder containing its manifest:
+Keep the complete internal catalog selected for PDF generation in
+`output-prod/catalog/`. Do not use the reduced `docs/data/` package.
+Retain older builds and drafts under `output-prod/archive/`; they are not
+active release candidates.
 
 ```cmd
-env\Scripts\python.exe scripts\render_fee_schedule.py PATH\TO\INTERNAL-DATA --permit-type "DSLC - Zoning Permit" --work-class "Zoning Change of Use" --output-dir output-prod\pdf-draft-zoning --pdf --internal
+env\Scripts\python.exe scripts\render_fee_schedule.py output-prod\catalog --permit-type "DSLC - Zoning Permit" --work-class "Zoning Change of Use" --output-dir output-prod\pdf-draft-zoning --pdf --internal
 ```
 
 This writes a PDF, an HTML preview, and rendering JSON with source hashes.
@@ -179,21 +181,34 @@ calculating a project total. Staff review of fee content is pending.
 italic footnote at the end. Without it, those dates are omitted. Documents
 do not display technical version identifiers.
 
-The three PDF layouts have been approved. Power Automate has converted one
-zoning HTML draft through OneDrive for Business and saved the PDF to SharePoint.
-Multi-page conversion still needs checking.
+For Power Automate, export all options as rendering JSON in one flat folder:
 
-Automated JSON-to-HTML generation and batch export are not implemented. The
-planned flow reads approved rendering JSON from SharePoint, creates temporary
-HTML in OneDrive, converts it to PDF, and saves the PDF to SharePoint. Copy only
-approved PDF inputs to SharePoint, not the repository or its working folders.
+```cmd
+env\Scripts\python.exe scripts\render_fee_schedule.py output-prod\catalog --all --internal --output-dir output-prod\pdf-inputs
+```
+
+Each file uses its displayed permit type and work class, for example
+`Zoning Permit - Zoning Change of Use.json`. No timestamps or random identifiers
+are added. The export checks every option and filename before writing. It
+refuses an existing output directory, including one containing older drafts.
+
+Copy only this folder to an internal SharePoint `PDF Inputs` folder. Keep it
+separate from source data, refresh outputs, archived drafts, and the public
+`docs/data/` package. Point the flow only at `PDF Inputs`, not `output-prod/`.
+On later exports, retain the previous inputs outside the active folder before
+replacing them. Copying new files over old ones can leave retired options behind.
+
+The three PDF layouts have been approved. Power Automate has rendered one JSON
+draft as HTML, converted it through OneDrive for Business, and saved the PDF to
+SharePoint. Multi-page and full-batch conversion still need checking. All files
+remain drafts pending staff review of the fee content.
 
 ## Remaining Work
 
 - Resolve missing form choices and unsupported calculations with staff when
   they are available. Until then, keep affected fees subject to review.
-- Check multi-page conversion, then implement the JSON-to-HTML flow and approved
-  PDF-input export. Check about 10 options before all 199.
+- Configure the flow to process `PDF Inputs` sequentially. Check multi-page
+  conversion and about 10 options before running all 199.
 - Verify a live data refresh after the saved-data checks. Only the user runs
   API extractions and database queries in this workflow.
 - Confirm SQL encryption settings before live organizational use.

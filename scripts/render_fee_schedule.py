@@ -367,6 +367,40 @@ def load_option(catalog, permit_type, work_class, *, internal=False):
     return model
 
 
+def schedule_filename(model):
+    stem = text(model["permitType"]) + " - " + text(model["workClass"])
+    stem = re.sub(r'[<>:"/\\|?*\x00-\x1f]', "-", stem)
+    stem = re.sub(r"\s+", " ", stem).strip(" .")[:160].rstrip(" .")
+    return stem + ".json"
+
+
+def export_schedules(catalog, destination, *, internal=False):
+    """Write only rendering JSON, with one readable filename per option."""
+    catalog, destination = Path(catalog).resolve(), Path(destination).resolve()
+    if destination.exists():
+        raise FileExistsError("Use a new PDF-input directory; existing files are never overwritten.")
+    manifest = json.loads((catalog / "manifest.json").read_text(encoding="utf-8"))
+    if manifest.get("schemaVersion") != "1.0":
+        raise ValueError("Use the complete internal catalog, not the reduced docs/data package.")
+    if not manifest.get("options"):
+        raise ValueError("The catalog contains no options.")
+    schedules = {}
+    names = set()
+    for option in manifest["options"]:
+        model = load_option(catalog, option["permitType"], option["workClass"], internal=internal)
+        filename = schedule_filename(model)
+        if filename.casefold() in names:
+            raise ValueError(f"PDF-input filenames must be unique: {filename}")
+        names.add(filename.casefold())
+        schedules[filename] = json.dumps(model, indent=2, ensure_ascii=False) + "\n"
+    # Check every option and filename before creating the output directory.
+    destination.mkdir(parents=True, exist_ok=False)
+    for filename, content in schedules.items():
+        with (destination / filename).open("x", encoding="utf-8") as stream:
+            stream.write(content)
+    return len(schedules)
+
+
 def print_pdf(source, destination, browser=None):
     candidates = [browser, shutil.which("google-chrome"), shutil.which("chromium"),
                   str(Path(os.environ.get("PROGRAMFILES", "C:/Program Files")) / "Google/Chrome/Application/chrome.exe")]
@@ -387,13 +421,23 @@ def print_pdf(source, destination, browser=None):
 def main():
     parser = argparse.ArgumentParser(description="Render an internal draft fee schedule without calculating a project estimate.")
     parser.add_argument("catalog", type=Path)
-    parser.add_argument("--permit-type", required=True)
-    parser.add_argument("--work-class", required=True)
+    parser.add_argument("--permit-type")
+    parser.add_argument("--work-class")
+    parser.add_argument("--all", action="store_true", help="Export rendering JSON for every option; no HTML or PDFs.")
     parser.add_argument("--output-dir", type=Path, required=True, help="New local directory; existing files are never overwritten.")
     parser.add_argument("--pdf", action="store_true", help="Print locally using installed Chrome.")
     parser.add_argument("--internal", action="store_true", help="Include source dates as a small footnote for internal use.")
     parser.add_argument("--browser", help="Optional Chrome executable path.")
     args = parser.parse_args()
+    if args.all:
+        if args.permit_type or args.work_class or args.pdf or args.browser:
+            parser.error("--all cannot be combined with --permit-type, --work-class, --pdf, or --browser.")
+        count = export_schedules(args.catalog, args.output_dir, internal=args.internal)
+        print(f"Draft fee-schedule JSON files: {count}")
+        print(f"Files: {args.output_dir.resolve()}")
+        return
+    if not args.permit_type or not args.work_class:
+        parser.error("Supply both --permit-type and --work-class, or use --all.")
     model = load_option(args.catalog, args.permit_type, args.work_class, internal=args.internal)
     args.output_dir.mkdir(parents=True, exist_ok=False)
     source = args.output_dir / "fee-schedule.html"

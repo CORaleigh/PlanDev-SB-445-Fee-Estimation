@@ -1,13 +1,15 @@
 import copy
+import io
 import json
 import sys
 import tempfile
 import unittest
+from contextlib import redirect_stderr, redirect_stdout
 from pathlib import Path
 from unittest.mock import patch
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "scripts"))
-from render_fee_schedule import DRAFT, Schedule, load_option, main, money, render_html
+from render_fee_schedule import DRAFT, Schedule, export_schedules, load_option, main, money, render_html, schedule_filename
 
 
 def fee(key, section="configured", mode="fixed", name=None):
@@ -28,7 +30,95 @@ def document():
     }
 
 
+def write_catalog(root, permits=("Permit",)):
+    (root / "options").mkdir(parents=True)
+    manifest = {"schemaVersion": "1.0", "configurationAsOfDate": "2026-10-14", "options": []}
+    for index, permit in enumerate(permits):
+        doc = document()
+        doc["option"].update(permitType=permit, optionKey=f"option-{index}")
+        path = f"options/{index}.json"
+        (root / path).write_text(json.dumps(doc), encoding="utf-8")
+        manifest["options"].append({**doc["option"], "path": path})
+    (root / "manifest.json").write_text(json.dumps(manifest), encoding="utf-8")
+
+
 class FeeScheduleTests(unittest.TestCase):
+    def test_batch_exports_only_rendering_json_with_readable_names(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            catalog, destination = root / "catalog", root / "pdf-inputs"
+            write_catalog(catalog, ("Permit / One", "Permit Two"))
+            self.assertEqual(export_schedules(catalog, destination, internal=True), 2)
+            self.assertEqual(sorted(p.name for p in destination.iterdir()),
+                             ["Permit - One - Work.json", "Permit Two - Work.json"])
+            for permit in ("Permit / One", "Permit Two"):
+                expected = load_option(catalog, permit, "Work", internal=True)
+                actual = json.loads((destination / schedule_filename(expected)).read_text(encoding="utf-8"))
+                self.assertEqual(actual, expected)
+                self.assertTrue(actual["internal"])
+                self.assertEqual(actual["schemaVersion"], "schedule-draft-1.0")
+
+    def test_batch_rejects_colliding_names_before_writing(self):
+        for permits in (("Permit / One", "Permit : One"), ("Permit", "permit")):
+            with self.subTest(permits=permits), tempfile.TemporaryDirectory() as tmp:
+                root = Path(tmp)
+                write_catalog(root / "catalog", permits)
+                with self.assertRaisesRegex(ValueError, "filenames must be unique"):
+                    export_schedules(root / "catalog", root / "pdf-inputs")
+                self.assertFalse((root / "pdf-inputs").exists())
+
+    def test_batch_checks_all_options_before_creating_output(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            write_catalog(root / "catalog", ("First", "Second"))
+            path = root / "catalog/options/1.json"
+            doc = json.loads(path.read_text(encoding="utf-8"))
+            doc["option"]["optionKey"] = "wrong"
+            path.write_text(json.dumps(doc), encoding="utf-8")
+            with self.assertRaisesRegex(ValueError, "identity"):
+                export_schedules(root / "catalog", root / "pdf-inputs")
+            self.assertFalse((root / "pdf-inputs").exists())
+
+    def test_batch_never_overwrites_existing_output(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            write_catalog(root / "catalog")
+            destination = root / "pdf-inputs"
+            destination.mkdir()
+            existing = destination / "keep.json"
+            existing.write_text("user data", encoding="utf-8")
+            with self.assertRaises(FileExistsError):
+                export_schedules(root / "catalog", destination)
+            self.assertEqual(existing.read_text(encoding="utf-8"), "user data")
+            self.assertEqual(list(destination.iterdir()), [existing])
+
+    def test_batch_rejects_public_or_empty_catalog(self):
+        for manifest in ({"schemaVersion": "public-1.0", "options": []},
+                         {"schemaVersion": "1.0", "options": []}):
+            with self.subTest(manifest=manifest), tempfile.TemporaryDirectory() as tmp:
+                root = Path(tmp)
+                (root / "manifest.json").write_text(json.dumps(manifest), encoding="utf-8")
+                with self.assertRaises(ValueError):
+                    export_schedules(root, root / "pdf-inputs")
+                self.assertFalse((root / "pdf-inputs").exists())
+
+    def test_batch_cli_and_selection_validation(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            write_catalog(root / "catalog")
+            arguments = ["render", str(root / "catalog"), "--output-dir", str(root / "pdf-inputs")]
+            for flags in ([], ["--permit-type", "Permit"], ["--all", "--pdf"],
+                          ["--all", "--permit-type", "Permit"]):
+                with self.subTest(flags=flags), patch.object(sys, "argv", arguments + flags), redirect_stderr(io.StringIO()):
+                    with self.assertRaises(SystemExit):
+                        main()
+                    self.assertFalse((root / "pdf-inputs").exists())
+            with patch.object(sys, "argv", arguments + ["--all"]), redirect_stdout(io.StringIO()):
+                main()
+            model = json.loads((root / "pdf-inputs/Permit - Work.json").read_text(encoding="utf-8"))
+            self.assertFalse(model["internal"])
+            self.assertNotIn("configurationDate", model)
+
     def test_preserves_configured_rates_smaller_than_one_cent(self):
         self.assertEqual(money(0.0021), "$0.0021")
         self.assertEqual(money(0.0001), "$0.0001")
