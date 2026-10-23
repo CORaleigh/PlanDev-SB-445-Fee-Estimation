@@ -151,7 +151,7 @@ class PrototypeEstimatorTests(unittest.TestCase):
         )
         self.assertEqual(
             report["estimateStatusLabel"],
-            "Estimate calculated",
+            "Estimate Calculated",
         )
         self.assertEqual(report["staffReviewFees"], [])
         self.assertEqual(
@@ -210,7 +210,7 @@ class PrototypeEstimatorTests(unittest.TestCase):
         )
         self.assertEqual(
             report["estimateStatusLabel"],
-            "Estimate ready",
+            "Estimate Ready",
         )
         self.assertEqual(report["staffReviewReasons"], [])
         self.assertEqual(report["estimatedTotal"], 104.0)
@@ -547,7 +547,7 @@ class PrototypeEstimatorTests(unittest.TestCase):
             rendered.count(">Technology Fee<"),
             1,
         )
-        self.assertIn("Fees included in this estimate", rendered)
+        self.assertIn("Fees Included in This Estimate", rendered)
 
     def test_staff_report_deduplicates_review_names(self):
         document = self.fixture()
@@ -580,14 +580,14 @@ class PrototypeEstimatorTests(unittest.TestCase):
             rendered.count(">Residential Zoning Fee<"),
             1,
         )
-        self.assertIn("Other fees that may apply", rendered)
+        self.assertIn("Other Fees That May Apply", rendered)
         self.assertNotIn("staff must review 1 item", rendered)
 
     def test_staff_report_lists_excluded_fees_once_in_plain_language(self):
         report = MODULE.build_report_model(self.fixture())
         rendered = MODULE.render_html(report)
 
-        self.assertIn("Other fees not included in this estimate", rendered)
+        self.assertIn("Other Fees Not Included in This Estimate", rendered)
         self.assertIn("Optional electrical", rendered)
         self.assertIn(
             "Additional Fee for Work Started Before a Permit (Electrical)",
@@ -743,12 +743,12 @@ class PrototypeEstimatorTests(unittest.TestCase):
         report = MODULE.build_report_model(self.fixture())
         rendered = MODULE.render_html(report)
 
-        self.assertIn("Permit fee estimate", rendered)
-        self.assertIn("Estimated initial permit fees: $104.00", rendered)
-        self.assertIn("Fees included in this estimate", rendered)
-        self.assertIn("Other fees that may apply", rendered)
-        self.assertIn("Estimate calculated", rendered)
-        self.assertIn("More details", rendered)
+        self.assertIn("Permit Fee Estimate", rendered)
+        self.assertIn("Estimated Initial Permit Fees: $104.00", rendered)
+        self.assertIn("Fees Included in This Estimate", rendered)
+        self.assertIn("Other Fees That May Apply", rendered)
+        self.assertIn("Estimate Calculated", rendered)
+        self.assertIn("More Details", rendered)
         self.assertNotIn("Staff-review items", rendered)
         self.assertNotIn("Calculation blockers", rendered)
         self.assertNotIn("Unresolved applicability", rendered)

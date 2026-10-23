@@ -19,7 +19,7 @@ from project_public_catalog import DEFAULT_MINIMUM_SAMPLE_SIZE, OptionProjection
 from prototype_estimator import display_fee_name, is_explicit_later_event_fee
 
 ROOT = Path(__file__).resolve().parents[1]
-DRAFT = "Draft: Staff review pending"
+DRAFT = "Draft: Staff Review Pending"
 LIMITS = (
     "This document describes configured fees and calculation methods. It does not assess a project, "
     "calculate a total, or provide an invoice or final fee statement. Staff must confirm applicability and amounts."
@@ -218,7 +218,7 @@ class Schedule:
         option = self.document["option"]
         return {
             "schemaVersion": "schedule-draft-1.0",
-            "status": "Internal draft: Staff review pending" if self.internal else DRAFT,
+            "status": "Internal Draft: Staff Review Pending" if self.internal else DRAFT,
             "internal": self.internal,
             **({"configurationDate": self.document["configuration"]["asOfDate"],
                 "historicalPeriod": self.document["configuration"].get("historicalPeriod") or {}}
@@ -253,19 +253,19 @@ def render_html(model):
                 method += f"<p class='review'>{esc(fee['review'])}</p>"
             rows.append((f"<small>{esc(fee['reference'])}</small><br><strong>{esc(fee['name'])}</strong>",
                          method, esc(fee["conditions"])))
-        body = table(("Fee / reference", "Configured method", "When it may apply"), rows) if rows else "<p>No entries listed.</p>"
+        body = table(("Fee / Reference", "Configured Method", "When It May Apply"), rows) if rows else "<p>No entries listed.</p>"
         return f"<section><h2>{esc(title)}</h2><p>{esc(note)}</p>{body}</section>"
 
     grouped = {}
     for item in model["inputs"]:
-        grouped.setdefault(item["group"] or "Project details", []).append(item)
-    inputs = table(("Project details", "Fields and choices"), [
+        grouped.setdefault(item["group"] or "Project Details", []).append(item)
+    inputs = table(("Project Details", "Fields and Choices"), [
         (esc(group), "<br>".join(f"<strong>{esc(i['name'])}</strong>: {esc(i['detail'])}" for i in items))
         for group, items in grouped.items()
     ]) if grouped else "<p>No customer-entered project fields are listed for the primary fees. Staff may need other information.</p>"
-    input_section = ("<h2>Project information used by the fee rules</h2>"
+    input_section = ("<h2>Project Information Used by the Fee Rules</h2>"
                      "<p>The fields below describe information that may be needed, not requirements for every project.</p>" + inputs
-                     if grouped else "<p><strong>Project information:</strong> No customer-entered fields are listed for the primary fees. Staff may need other information.</p>")
+                     if grouped else "<p><strong>Project Information:</strong> No customer-entered fields are listed for the primary fees. Staff may need other information.</p>")
     related_rows = []
     for relation in model["relatedPermits"]:
         fee_names = "<br>".join(f"{esc(f['name'])} ({esc(f['history'])})" for f in relation["fees"])
@@ -275,7 +275,7 @@ def render_html(model):
     related = ("<p>Informational only. Historical occurrence does not establish that a permit or fee is required. "
                "Related-permit fees are not added to a total. Permit percentages use similar past projects of the selected type and work class; "
                "fee percentages use only past projects containing that related permit. Small samples do not receive a percentage.</p>"
-               + table(("Related permit", "Historical occurrence", "Fees seen with this related permit (informational only)"), related_rows)
+               + table(("Related Permit", "Historical Occurrence", "Fees Seen with This Related Permit (Informational Only)"), related_rows)
                if related_rows else "<p>No related permits are shown under the estimator's history rules.</p>")
     footnote = ""
     if model.get("internal"):
@@ -287,18 +287,18 @@ def render_html(model):
             parts.append(f"Past projects reviewed: {period['startDate']} to {period['endDate']}")
         if parts:
             footnote = '<p class="internal-note"><em>' + esc(". ".join(parts) + ".") + '</em></p>'
-    footer_label = "Internal draft" if model.get("internal") else "Draft"
-    component_section = fees("Calculation components: Not separate charges", "calculationComponents",
+    footer_label = "Internal Draft" if model.get("internal") else "Draft"
+    component_section = fees("Calculation Components: Not Separate Charges", "calculationComponents",
                              "These values are inputs to other calculations. They are not additional charges. References identify the configured rows.") if model["calculationComponents"] else ""
-    primary = fees("Primary fee schedule and methodology", "primaryFees",
+    primary = fees("Primary Fee Schedule and Methodology", "primaryFees",
                    "These are configured fees, not a list of charges due. Conditions and project details determine which may apply.")
-    additional = fees("Additional fees that may apply", "additionalFees",
+    additional = fees("Additional Fees That May Apply", "additionalFees",
                       "Informational only. These fees may apply depending on the project and its scope, staff review, or later events such as reinspections. They are not added to a total.")
     title = f"{model['permitType']} / {model['workClass']}"
     return f"""<!doctype html>
 <html lang="en"><head><meta charset="utf-8">
 <meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src 'unsafe-inline'; img-src data:">
-<title>{esc(title)}: Draft fee schedule</title>
+<title>{esc(title)}: Draft Fee Schedule</title>
 <style>
 @page {{ size: letter{orientation}; margin: 12mm 12mm 15mm;
   @bottom-left {{ content: "{footer_label}"; font: 8pt Arial; color: #555; }}
@@ -325,13 +325,13 @@ small {{ color: #555; font-size: 8pt; }}
 .internal-note {{ font-size: 8pt; color: #666; }}
 @media screen {{ body {{ max-width: 820px; margin: 30px auto; padding: 20px; }} }}
 </style></head><body>
-<header><img alt="City of Raleigh" src="data:image/png;base64,{logo}"><div><h1>Fee schedule and calculation methods</h1>
+<header><img alt="City of Raleigh" src="data:image/png;base64,{logo}"><div><h1>Fee Schedule and Calculation Methods</h1>
 <strong>{esc(model['permitType'])}</strong><br>{esc(model['workClass'])}</div></header>
 <div class="draft"><strong>{esc(model['status'])}</strong>{esc(model['limitations'])}</div>
 {input_section}
 {primary}{additional}{component_section}
-<section><h2>Related permits</h2>{related}</section>
-<h2>Source and limitations</h2>
+<section><h2>Related Permits</h2>{related}</section>
+<h2>Source and Limitations</h2>
 <p>Fee information comes from EnerGov. Fees may have changed; staff must confirm the current amounts.
 F-number references identify rows in this document, not additional charges. Absence of a listed condition does not establish that a fee applies.
 Inactive fee rows are omitted ({model['inactiveFeesOmitted']}). No fees have been added together.</p>

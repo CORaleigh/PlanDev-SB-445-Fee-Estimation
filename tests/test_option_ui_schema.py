@@ -654,7 +654,7 @@ class OptionUiSchemaTests(unittest.TestCase):
             4,
         )
         self.assertEqual(
-            len(groups["Additional fee details"]["controlKeys"]),
+            len(groups["Additional Fee Details"]["controlKeys"]),
             7,
         )
         controls = {

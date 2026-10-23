@@ -299,7 +299,7 @@ def classify_estimate_status(
     if reasons:
         return {
             "code": "staff-review-required",
-            "label": "Staff review needed",
+            "label": "Staff Review Needed",
             "requiresStaffReview": True,
             "reasons": reasons,
         }
@@ -307,14 +307,14 @@ def classify_estimate_status(
     if possible_additional_fees:
         return {
             "code": "estimate-calculated-possible-additions",
-            "label": "Estimate calculated",
+            "label": "Estimate Calculated",
             "requiresStaffReview": False,
             "reasons": [],
         }
 
     return {
         "code": "automatic-estimate-complete",
-        "label": "Estimate ready",
+        "label": "Estimate Ready",
         "requiresStaffReview": False,
         "reasons": [],
     }
@@ -915,7 +915,7 @@ def render_html(report):
 
     if review_count:
         status_html = (
-            "<strong>Staff review needed.</strong> "
+            "<strong>Staff Review Needed.</strong> "
             f"The total below includes the fees this tool can calculate, "
             f"but staff must review {review_count} item"
             + ("" if review_count == 1 else "s")
@@ -923,24 +923,24 @@ def render_html(report):
         )
     elif possible_names:
         status_html = (
-            "<strong>Estimate calculated.</strong> The total below includes "
+            "<strong>Estimate Calculated.</strong> The total below includes "
             "the fees this tool can determine from the information entered. "
             "Other manually assessed fees may apply and are listed below."
         )
     else:
         status_html = (
-            "<strong>Estimate ready.</strong> Based on the information "
+            "<strong>Estimate Ready.</strong> Based on the information "
             "entered, the initial permit fees shown below can be calculated."
         )
 
     review_section = ""
     if review_count:
         review_section = f"""
-<h2>Items staff still need to review</h2>
+<h2>Items Staff Still Need to Review</h2>
 <p>These items are <strong>not included</strong> in the estimated total unless
 an amount is shown elsewhere.</p>
 <table>
-<thead><tr><th>Fee or item</th><th>What needs review</th></tr></thead>
+<thead><tr><th>Fee or Item</th><th>What Needs Review</th></tr></thead>
 <tbody>{review_rows}</tbody>
 </table>
 """
@@ -952,7 +952,7 @@ an amount is shown elsewhere.</p>
             for name in possible_names
         )
         possible_section = f"""
-<h2>Other fees that may apply</h2>
+<h2>Other Fees That May Apply</h2>
 <p>These fees are assessed manually and are not included in the estimated
 total. They may apply depending on the project and its scope.</p>
 <table>
@@ -984,7 +984,7 @@ total. They may apply depending on the project and its scope.</p>
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Permit fee estimate</title>
+<title>Permit Fee Estimate</title>
 <style>
 :root {{ font-family: Arial, sans-serif; color: #202124; background: #fff; }}
 body {{ margin: 0; }}
@@ -1007,16 +1007,16 @@ details {{ margin-top: 2rem; border-top: 1px solid #d9dde1; padding-top: 1rem; }
 </head>
 <body>
 <main>
-<h1>Permit fee estimate</h1>
+<h1>Permit Fee Estimate</h1>
 <p class="subtitle"><strong>{html.escape(str(option.get('displayPermitType') or option['permitType']))}</strong>
 &middot; {html.escape(str(option.get('displayWorkClass') or option['workClass']))}</p>
 
 <div class="notice">{status_html}</div>
 
-<div class="total">Estimated initial permit fees: {_money(report['estimatedTotal'])}</div>
+<div class="total">Estimated Initial Permit Fees: {_money(report['estimatedTotal'])}</div>
 {extra_charge}
 
-<h2>Fees included in this estimate</h2>
+<h2>Fees Included in This Estimate</h2>
 <table>
 <thead><tr><th>Fee</th><th>Amount</th>{'<th>Notes</th>' if show_included_notes else ''}</tr></thead>
 <tbody>{included_rows}</tbody>
@@ -1030,8 +1030,8 @@ determined from the information provided. Later charges, such as reinspection
 fees, are not included unless they actually occur.</p>
 
 <details>
-<summary>More details</summary>
-<h3>Other fees not included in this estimate</h3>
+<summary>More Details</summary>
+<h3>Other Fees Not Included in This Estimate</h3>
 {other_fee_section}
 <p class="meta">Fee schedule date: {html.escape(str(report.get('configurationAsOfDate') or 'unknown'))}.</p>
 </details>

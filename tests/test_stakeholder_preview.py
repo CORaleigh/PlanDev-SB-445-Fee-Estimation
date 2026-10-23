@@ -17,7 +17,7 @@ class StakeholderPreviewTests(unittest.TestCase):
         self.assertIn('role="note"', index)
         self.assertIn("STAKEHOLDER_PREVIEW", config)
         self.assertIn("enabled: true", config)
-        self.assertIn("Preview: For review only", config)
+        self.assertIn("Preview: For Review Only", config)
         self.assertNotIn("Internal preview", config)
         self.assertIn(
             'import { OPTION_LABEL_MODE, STAKEHOLDER_PREVIEW }',
@@ -42,6 +42,15 @@ class StakeholderPreviewTests(unittest.TestCase):
         self.assertNotIn("currently validated catalog", interface.lower())
         self.assertNotIn("mature, non-terminal permits", interface.lower())
         self.assertNotIn("historical parent permit families", interface.lower())
+
+    def test_page_and_document_titles_use_title_case(self):
+        for name, title in (("README.md", "Raleigh Development Fee Estimate"),
+                            ("UPDATE.md", "Updating the Fee Data")):
+            self.assertTrue((ROOT / name).read_text(encoding="utf-8").startswith("# " + title + "\n"))
+        index = (DOCS / "index.html").read_text(encoding="utf-8")
+        for element in ("<title>Permit Fee Estimate</title>", "<h1>Permit Fee Estimate</h1>",
+                        "<h2>Project Details</h2>", "<h3>Related Permits</h3>"):
+            self.assertIn(element, index)
 
     def test_owned_source_and_documentation_do_not_contain_em_dashes(self):
         files = list(ROOT.glob("*.md"))

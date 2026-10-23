@@ -1,4 +1,4 @@
-# Raleigh development fee estimate
+# Raleigh Development Fee Estimate
 
 This repository contains a static development-fee estimator for the City of
 Raleigh and the scripts needed to update its data.
@@ -17,7 +17,7 @@ derived from current EnerGov configuration and validated evidence. It does not
 by itself manage completed-application dates, statutory deadlines, estimate
 records, revisions, final binding statements, or annual reports.
 
-## Fee presentation
+## Fee Presentation
 
 The estimator separates three types of information:
 
@@ -46,7 +46,7 @@ The public site omits source dates. Internal browser reviews and PDF drafts
 can include them as a small footnote. Technical version identifiers are not
 displayed.
 
-## Repository contents
+## Repository Contents
 
 - `docs/`: GitHub Pages site and reduced public estimator JSON.
 - `queries/`: SQL used to rebuild supporting fee evidence.
@@ -60,7 +60,7 @@ displayed.
 Source extracts, credentials, generated candidates, and historical evidence
 files are not committed.
 
-## Internal and public data
+## Internal and Public Data
 
 The complete catalog is the source for refresh review, rule validation, and
 PDF generation. It remains under ignored local storage or an approved internal
@@ -102,7 +102,7 @@ live extraction or SQL query. Do not commit `.env`.
 
 See `UPDATE.md` for the source queries and the files they produce.
 
-## Validate the current release
+## Validate the Current Release
 
 ```cmd
 env\Scripts\python.exe -m unittest discover -s tests -p "test_*.py" -q
@@ -110,7 +110,7 @@ node scripts\audit_static_runtime_coverage.mjs --catalog-dir docs\data
 env\Scripts\python.exe scripts\audit_public_static_site.py docs
 ```
 
-## Refresh the catalog
+## Refresh the Catalog
 
 Check that all local inputs are present before making an API request:
 
@@ -139,7 +139,7 @@ The refresh process:
 Use `--refresh-history` only when the configured historical fee-detail and
 cohort files are available and a historical rebuild is intended.
 
-## Promote a reviewed candidate
+## Promote a Reviewed Candidate
 
 ```cmd
 env\Scripts\python.exe scripts\promote_estimator.py
@@ -150,7 +150,7 @@ reduced package to `docs/data/`, reruns the release checks, and stages only
 `docs/data/`. It does not commit, push, enable GitHub Pages, or change repository
 visibility.
 
-## Local site
+## Local Site
 
 ```cmd
 env\Scripts\python.exe -m http.server 8000 --directory docs
@@ -161,7 +161,7 @@ Open `http://localhost:8000/`.
 GitHub Pages should publish the `/docs` directory only after the intended
 audience and the downloadable JSON content have been approved.
 
-## Draft fee-schedule PDFs
+## Draft Fee-Schedule PDFs
 
 Generate one draft from the retained internal data, not `docs/data/`.
 Replace `PATH\TO\INTERNAL-DATA` with the folder containing its manifest:
@@ -188,7 +188,7 @@ planned flow reads approved rendering JSON from SharePoint, creates temporary
 HTML in OneDrive, converts it to PDF, and saves the PDF to SharePoint. Copy only
 approved PDF inputs to SharePoint, not the repository or its working folders.
 
-## Remaining work
+## Remaining Work
 
 - Resolve missing form choices and unsupported calculations with staff when
   they are available. Until then, keep affected fees subject to review.
@@ -197,5 +197,5 @@ approved PDF inputs to SharePoint, not the repository or its working folders.
 - Verify a live data refresh after the saved-data checks. Only the user runs
   API extractions and database queries in this workflow.
 - Confirm SQL encryption settings before live organizational use.
-- Enable GitHub Pages only after approval, then check the hosted site, including
+- Recheck the hosted site after updates, including
   project-subpath loading, calculations, review notices, and narrow screens.

@@ -136,8 +136,12 @@ class FeeScheduleTests(unittest.TestCase):
         page = render_html(model)
         self.assertNotIn("<script>", page)
         self.assertNotIn("\u2014", page)
-        self.assertIn("Additional fees that may apply", page)
-        self.assertIn("Related permits", page)
+        for heading in ("Fee Schedule and Calculation Methods", "Primary Fee Schedule and Methodology",
+                        "Additional Fees That May Apply", "Related Permits", "Source and Limitations"):
+            self.assertRegex(page, "<h[12]>" + heading + "</h[12]>")
+        for header in ("Fee / Reference", "Configured Method", "When It May Apply"):
+            self.assertIn("<th>" + header + "</th>", page)
+        self.assertIn("Permit / Work: Draft Fee Schedule</title>", page)
         self.assertIn("default-src 'none'", page)
         self.assertNotRegex(page, r'(?:src|href)=["\x27]https?://')
 
@@ -152,9 +156,10 @@ class FeeScheduleTests(unittest.TestCase):
         self.assertNotIn("2024-02-01", render_html(external))
         internal = Schedule(doc, internal=True).project()
         page = render_html(internal)
+        self.assertIn("<strong>Internal Draft: Staff Review Pending</strong>", page)
         marker = '<p class="internal-note"><em>'
         self.assertIn(marker, page)
-        self.assertGreater(page.index(marker), page.index("Related permits"))
+        self.assertGreater(page.index(marker), page.index("Related Permits"))
         self.assertNotIn("2024-02-01", page[:page.index(marker)])
         self.assertIn("Fee configuration as of 2024-02-01", page[page.index(marker):])
         self.assertIn("Past projects reviewed: 2020-01-01 to 2024-01-01", page)

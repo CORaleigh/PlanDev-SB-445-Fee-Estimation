@@ -5,7 +5,7 @@ export const OPTION_LABEL_MODE = "external";
 // The preview banner does not change calculations or restrict access.
 export const STAKEHOLDER_PREVIEW = {
   enabled: true,
-  heading: "Preview: For review only",
+  heading: "Preview: For Review Only",
   showSourceDates: false, // Enable only for internal review.
   message:
     "This tool provides a preliminary fee estimate based on the information "

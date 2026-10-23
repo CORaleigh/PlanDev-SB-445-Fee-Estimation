@@ -1,7 +1,7 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://raleighnc.gov/schemas/permit-fee-estimator/catalog-option-v1.schema.json",
-  "title": "Permit fee estimator option",
+  "title": "Permit Fee Estimator Option",
   "description": "Complete internal data for one permit type and work class. The static site uses a separate reduced format.",
   "type": "object",
   "additionalProperties": false,

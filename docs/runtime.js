@@ -996,7 +996,7 @@ function applyControlPresentation(document, controls) {
         control,
         group: {
           key: "supplemental:additional-fee-details",
-          label: "Additional fee details",
+          label: "Additional Fee Details",
           kind: "supplemental",
           collapsedByDefault: true,
         },
@@ -2080,7 +2080,7 @@ function classifyEstimateStatus(blocked, unresolved, staffReview, possibleAdditi
   if (reasons.length) {
     return {
       code: "staff-review-required",
-      label: "Staff review needed",
+      label: "Staff Review Needed",
       requiresStaffReview: true,
       reasons,
     };
@@ -2088,14 +2088,14 @@ function classifyEstimateStatus(blocked, unresolved, staffReview, possibleAdditi
   if (possibleAdditional.length) {
     return {
       code: "estimate-calculated-possible-additions",
-      label: "Estimate calculated",
+      label: "Estimate Calculated",
       requiresStaffReview: false,
       reasons: [],
     };
   }
   return {
     code: "automatic-estimate-complete",
-    label: "Estimate ready",
+    label: "Estimate Ready",
     requiresStaffReview: false,
     reasons: [],
   };

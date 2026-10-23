@@ -226,11 +226,11 @@ function relatedFeeTable(relation, fees) {
   const table = document.createElement("table");
   addTableCaption(
     table,
-    `Fees found with ${relatedPermitLabel(relation)}`,
+    `Fees Found with ${relatedPermitLabel(relation)}`,
   );
   const head = document.createElement("thead");
   const headRow = document.createElement("tr");
-  for (const label of ["Fee", "Past projects"]) {
+  for (const label of ["Fee", "Past Projects"]) {
     const th = document.createElement("th");
     th.scope = "col";
     th.textContent = label;
@@ -505,8 +505,7 @@ function controlGroup(group, controls) {
   const summary = document.createElement("summary");
   const title = document.createElement("span");
   title.className = "control-group-title";
-  title.textContent = group.label === "Additional Fee Details"
-    ? "Additional fee details" : group.label;
+  title.textContent = group.label;
   const count = document.createElement("span");
   count.className = "control-group-count";
   count.textContent = `${controls.length} question${controls.length === 1 ? "" : "s"}`;
@@ -626,14 +625,14 @@ const PROMINENT_DISCLOSURE_TEXT = new Map([
   [
     "ENERGOV_SOURCE_OF_TRUTH",
     {
-      title: "Current fee data",
+      title: "Current Fee Data",
       text: "Fees and calculation rules may change. Current assessed charges may differ.",
     },
   ],
   [
     "ESTIMATE_NOT_INVOICE",
     {
-      title: "Estimate only",
+      title: "Estimate Only",
       text: "This is an estimate, not an invoice or a guarantee of final charges.",
     },
   ],
@@ -717,7 +716,7 @@ function renderEstimateLimitations() {
   if (!disclosures.length) return;
 
   const heading = document.createElement("h3");
-  heading.textContent = "Important information";
+  heading.textContent = "Important Information";
   elements.estimateLimitations.appendChild(heading);
 
   const list = document.createElement("ul");
@@ -747,7 +746,7 @@ function renderEstimateInputs(values) {
     .filter(({ rawValue }) => String(rawValue ?? "").trim() !== "");
 
   const heading = document.createElement("h3");
-  heading.textContent = "Project information used";
+  heading.textContent = "Project Information Used";
   elements.estimateInputs.appendChild(heading);
 
   if (!supplied.length) {
@@ -758,10 +757,10 @@ function renderEstimateInputs(values) {
   }
 
   const table = document.createElement("table");
-  addTableCaption(table, "Project inputs used");
+  addTableCaption(table, "Project Inputs Used");
   const head = document.createElement("thead");
   const headRow = document.createElement("tr");
-  for (const label of ["Project detail", "Value"]) {
+  for (const label of ["Project Detail", "Value"]) {
     const cell = document.createElement("th");
     cell.textContent = label;
     headRow.appendChild(cell);
@@ -793,7 +792,7 @@ function addTableCaption(table, text) {
 
 function feeTable(items) {
   const table = document.createElement("table");
-  addTableCaption(table, "Calculated fees");
+  addTableCaption(table, "Calculated Fees");
   const head = document.createElement("thead");
   const headRow = document.createElement("tr");
   for (const label of ["Fee", "Amount"]) {
@@ -868,11 +867,11 @@ function reviewTable(report, includedNames) {
   if (!items.length) return;
 
   const heading = document.createElement("h3");
-  heading.textContent = "Fees that need review";
+  heading.textContent = "Fees That Need Review";
   elements.reviewItems.appendChild(heading);
 
   const table = document.createElement("table");
-  addTableCaption(table, "Items that still need review");
+  addTableCaption(table, "Items That Still Need Review");
   const head = document.createElement("thead");
   const row = document.createElement("tr");
   for (const label of ["Fee", "Reason"]) {
@@ -909,7 +908,7 @@ function renderPossibleAdditionalFees(report, includedNames) {
   if (!names.length) return;
 
   const heading = document.createElement("h3");
-  heading.textContent = "Other fees that may apply";
+  heading.textContent = "Other Fees That May Apply";
   elements.reviewItems.appendChild(heading);
 
   const note = document.createElement("p");
@@ -953,15 +952,15 @@ function renderReport(report, values) {
   }
 
   elements.total.textContent = report.requiresStaffReview
-    ? `Calculated fees so far: ${money(report.estimatedTotal)}`
-    : `Estimated total: ${money(report.estimatedTotal)}`;
+    ? `Calculated Fees So Far: ${money(report.estimatedTotal)}`
+    : `Estimated Total: ${money(report.estimatedTotal)}`;
 
   renderEstimateLimitations();
   renderEstimateInputs(values);
 
   clear(elements.calculatedFees);
   const heading = document.createElement("h3");
-  heading.textContent = "Calculated fees";
+  heading.textContent = "Calculated Fees";
   elements.calculatedFees.appendChild(heading);
 
   const fees = [

@@ -1,4 +1,4 @@
-# Updating the fee data
+# Updating the Fee Data
 
 This repository contains the reusable API, SQL, build, test, and release
 tools. Credentials, query results, source extracts, and generated candidates
@@ -22,7 +22,7 @@ review. The build preserves their source rates and rules, but neither they
 nor calculations that need their amounts can enter a total until resolved.
 The review configuration is checked before a live refresh makes API requests.
 
-## Local setup
+## Local Setup
 
 Create the local configuration:
 
@@ -45,7 +45,7 @@ The SQL helper currently sets `Encrypt=no` and `TrustServerCertificate=yes`.
 Confirm the required encryption and certificate settings with IT before
 organizational use. They were not changed or tested against a live server.
 
-## Required local inputs
+## Required Local Inputs
 
 `config\refresh-inputs.json` identifies every local input. Before the first
 refresh in a new checkout, place the last approved normalized permit-fee
@@ -67,7 +67,7 @@ env\Scripts\python.exe scripts\refresh_estimator.py --as-of YYYY-MM-DD --check-i
 
 The command reports missing inputs and makes no EnerGov API requests.
 
-## Historical fee and related-permit evidence
+## Historical Fee and Related-Permit Evidence
 
 Run both queries from the same database snapshot:
 
@@ -88,7 +88,7 @@ env\Scripts\python.exe scripts\build_fee_usage_patterns.py local-data\permit_fam
 The main refresh performs this last build step when `--refresh-history` is
 used. It still requires the two current CSV files.
 
-## Inspection fees
+## Inspection Fees
 
 Extract and normalize the current inspection fee configuration:
 
@@ -113,7 +113,7 @@ env\Scripts\python.exe scripts\validate_inspection_fee_rules.py local-data\inspe
 Query 13 is retained for direct review of technology-surcharge assessment
 behavior when that rule changes.
 
-## Choice labels
+## Choice Labels
 
 Available choices come from the selected form in the API extract. SQL labels
 alone do not establish which choices that form permits. Unlabeled choices are
@@ -137,7 +137,7 @@ env\Scripts\python.exe scripts\run_query.py queries\117_condition_choice_label_g
 Do not infer labels for missing or blank pick-list items. The affected fee must
 remain subject to staff review until its configured choice is confirmed.
 
-## Project-detail percentages
+## Project-Detail Percentages
 
 Queries 122 and 123 reproduce the two earlier broad option studies:
 
@@ -168,7 +168,7 @@ env\Scripts\python.exe scripts\build_option_input_prevalence_query.py PATH\TO\IN
 env\Scripts\python.exe scripts\run_query.py local-data\electrical_nonres_alteration_input_prevalence.sql --all-results --output-dir local-data\electrical-prevalence --overwrite --preview-rows 0
 ```
 
-## Fee-assessment evidence
+## Fee-Assessment Evidence
 
 Generate the query from the complete fee calculation relationships under
 review, then run it. Use the retained internal catalog for the current release.
@@ -183,7 +183,7 @@ env\Scripts\python.exe scripts\run_query.py local-data\catalog_fee_assessment_ev
 
 `result-02.csv` is the catalog input.
 
-## Fixed-fee behavior
+## Fixed-Fee Behavior
 
 Rebuild fixed-fee evidence when fixed assignments or amounts change. Use the
 catalog directory being reviewed. A temporary review catalog may use the prior
@@ -196,7 +196,7 @@ env\Scripts\python.exe scripts\analyze_fixed_fee_behavior.py PATH\TO\CATALOG loc
 The date range must cover the period being reviewed. Review the summary before
 using it in a release.
 
-## Refresh and release candidate
+## Refresh and Release Candidate
 
 After the input check passes:
 

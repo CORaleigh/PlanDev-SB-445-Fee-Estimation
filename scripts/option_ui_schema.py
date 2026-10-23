@@ -604,7 +604,7 @@ def _apply_control_presentation(document, controls):
             if inherited or applicability_only:
                 group = {
                     "key": "supplemental:additional-fee-details",
-                    "label": "Additional fee details",
+                    "label": "Additional Fee Details",
                     "kind": "supplemental",
                     "collapsedByDefault": True,
                 }

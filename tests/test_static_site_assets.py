@@ -300,7 +300,7 @@ assert.equal(elements.calculate.disabled, true);
         app = (DOCS / "app.js").read_text(encoding="utf-8")
         self.assertIn("renderPossibleAdditionalFees", app)
         self.assertIn("report.possibleAdditionalFees", app)
-        self.assertIn("Other fees that may apply", app)
+        self.assertIn("Other Fees That May Apply", app)
 
     def test_static_ui_surfaces_estimate_traceability_and_limitations(self):
         index = (DOCS / "index.html").read_text(encoding="utf-8")
@@ -317,8 +317,8 @@ assert.equal(elements.calculate.disabled, true);
         self.assertIn('"ESTIMATE_NOT_INVOICE"', app)
         self.assertNotIn('"CONFIGURATION_AS_OF_DATE"', app)
         self.assertIn('"ENERGOV_SOURCE_OF_TRUTH"', app)
-        self.assertIn("Important information", app)
-        self.assertIn("Project information used", app)
+        self.assertIn("Important Information", app)
+        self.assertIn("Project Information Used", app)
         self.assertIn("renderSourceNote()", app)
         self.assertIn("No project details were entered.", app)
         self.assertIn("renderEstimateInputs(values)", app)
@@ -479,7 +479,7 @@ assert.equal(elements.calculate.disabled, true);
         self.assertIn('content: "−";', styles)
         self.assertIn("DENSE_OPTION_CONTROL_THRESHOLD", runtime)
         self.assertIn("applyControlPresentation", runtime)
-        self.assertIn("Additional fee details", runtime)
+        self.assertIn("Additional Fee Details", runtime)
         self.assertNotIn("Right-of-Way Occupancy", runtime)
         self.assertNotIn("Accessory Structure", runtime)
 
@@ -603,10 +603,10 @@ assert.equal(elements.calculate.disabled, true);
         self.assertIn('tabindex="-1"', index)
         self.assertGreaterEqual(index.count('aria-live="polite"'), 3)
         self.assertIn("elements.results.focus();", app)
-        self.assertIn("addTableCaption(table, \"Calculated fees\")", app)
-        self.assertIn("addTableCaption(table, \"Project inputs used\")", app)
+        self.assertIn("addTableCaption(table, \"Calculated Fees\")", app)
+        self.assertIn("addTableCaption(table, \"Project Inputs Used\")", app)
         self.assertIn(
-            'addTableCaption(table, "Items that still need review")',
+            'addTableCaption(table, "Items That Still Need Review")',
             app,
         )
         self.assertIn("input:focus-visible", styles)
@@ -745,7 +745,7 @@ assert.equal(elements.calculate.disabled, true);
                 4,
             )
             self.assertEqual(
-                len(groups["Additional fee details"]["controlKeys"]),
+                len(groups["Additional Fee Details"]["controlKeys"]),
                 7,
             )
         finally:

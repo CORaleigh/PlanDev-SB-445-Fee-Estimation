@@ -1,7 +1,7 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://raleighnc.gov/schemas/permit-fee-estimator/public-manifest-v1.schema.json",
-  "title": "Public permit fee estimator manifest",
+  "title": "Public Permit Fee Estimator Manifest",
   "type": "object",
   "additionalProperties": false,
   "required": [

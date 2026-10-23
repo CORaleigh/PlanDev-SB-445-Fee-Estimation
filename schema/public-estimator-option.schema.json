@@ -1,7 +1,7 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://raleighnc.gov/schemas/permit-fee-estimator/public-option-v1.schema.json",
-  "title": "Public permit fee estimator option",
+  "title": "Public Permit Fee Estimator Option",
   "description": "Reduced data used by the static estimator. The complete internal catalog remains the source for refresh review and PDF generation.",
   "type": "object",
   "additionalProperties": false,
