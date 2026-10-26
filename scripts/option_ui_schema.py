@@ -138,7 +138,7 @@ def clean_staff_facing_label(
             r"\bIndustrialManufacturingAgricultural\b",
             "Industrial / Manufacturing / Agricultural",
         ),
-        (r"\bMultiFamilydwellings\b", "Multifamily Dwellings"),
+        (r"\bMulti[\s-]*Family\s*Dwellings\b", "Multifamily Dwellings"),
         (r"\bWorkingwithouta\b", "Working without a"),
         (r"\bNumberof\b", "Number of"),
         (r"\bTypeof\b", "Type of"),

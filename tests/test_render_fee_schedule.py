@@ -43,6 +43,17 @@ def write_catalog(root, permits=("Permit",)):
 
 
 class FeeScheduleTests(unittest.TestCase):
+    def test_multifamily_label_is_readable_without_changing_source_fields(self):
+        doc = document()
+        doc["fees"][0]["calculation"]["rule"]["inputs"] = [{
+            "inputKey": "MultiFamilydwellings", "label": "Multi Familydwellings", "source": "custom-field",
+        }]
+        before = copy.deepcopy(doc)
+        model = Schedule(doc).project()
+        self.assertIn("Multifamily Dwellings", [item["name"] for item in model["inputs"]])
+        self.assertIn("Multifamily Dwellings", render_html(model))
+        self.assertEqual(doc, before)
+
     def test_batch_exports_only_rendering_json_with_readable_names(self):
         with tempfile.TemporaryDirectory() as tmp:
             root = Path(tmp)

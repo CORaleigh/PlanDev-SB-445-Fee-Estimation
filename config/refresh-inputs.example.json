@@ -10,9 +10,7 @@
   "fixedFeeBehavior": "local-data/fixed-fee/fixed_fee_behavior_summary.csv",
   "choiceLabels": "local-data/choice-labels/result-01.csv",
   "inputPrevalence": [
-    "local-data/electrical-prevalence/result-02.csv",
-    "local-data/building_accessory_input_prevalence.csv",
-    "local-data/row_occupancy_input_prevalence.csv"
+    "local-data/input-prevalence/result-02.csv"
   ],
   "assessmentEvidence": [
     "local-data/fee-assessment/result-02.csv"

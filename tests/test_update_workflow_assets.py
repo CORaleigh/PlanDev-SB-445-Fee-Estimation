@@ -33,6 +33,13 @@ REQUIRED_QUERIES = {
 
 
 class UpdateWorkflowAssetTests(unittest.TestCase):
+    def test_refresh_requires_all_option_field_history(self):
+        config = json.loads((ROOT / "config/refresh-inputs.example.json").read_text(encoding="utf-8"))
+        self.assertEqual(config["inputPrevalence"], ["local-data/input-prevalence/result-02.csv"])
+        refresh = (ROOT / "scripts/refresh_estimator.py").read_text(encoding="utf-8")
+        self.assertIn('"--require-input-prevalence"', refresh)
+        self.assertIn("--all", (ROOT / "UPDATE.md").read_text(encoding="utf-8"))
+
     def test_required_update_sources_are_retained(self):
         for name in REQUIRED_SCRIPTS:
             self.assertTrue((ROOT / "scripts" / name).is_file(), name)

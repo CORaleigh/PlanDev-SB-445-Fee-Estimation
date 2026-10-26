@@ -532,7 +532,7 @@ export function cleanStaffFacingLabel(
     [/\bMec_Contractor\b/gi, "Mechanical Contractor"],
     [/\bMec Contractor\b/gi, "Mechanical Contractor"],
     [/\bIndustrialManufacturingAgricultural\b/g, "Industrial / Manufacturing / Agricultural"],
-    [/\bMultiFamilydwellings\b/gi, "Multifamily Dwellings"],
+    [/\bMulti[\s-]*Family\s*Dwellings\b/gi, "Multifamily Dwellings"],
     [/\bWorkingwithouta\b/gi, "Working without a"],
     [/\bNumberof\b/gi, "Number of"],
     [/\bTypeof\b/gi, "Type of"],

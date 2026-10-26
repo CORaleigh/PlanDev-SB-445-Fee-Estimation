@@ -72,6 +72,10 @@ identifiers, source filenames, database class names, exact historical counts,
 or assessment evidence. Historical percentages are rounded to whole numbers.
 Samples below 10 records are shown only as limited history.
 
+Project-field percentages require the all-option SQL result described in
+`UPDATE.md`. The refresh checks coverage for every supported project field;
+missing source columns or historical records are not treated as zero usage.
+
 Do not use `docs/data/` as the source for refresh analysis or PDFs. It is a
 reduced delivery format, not the complete catalog.
 

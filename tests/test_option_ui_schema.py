@@ -268,6 +268,7 @@ class OptionUiSchemaTests(unittest.TestCase):
         fields = [
             ("Workingwithouta", "Workingwithouta"),
             ("Both_Mech_and_Ele", "Both_Mech_and_Ele"),
+            ("MultiFamilydwellings", "Multi Familydwellings"),
             ("ROW", "ROW"),
             ("ADA", "ADA"),
         ]
@@ -313,6 +314,7 @@ class OptionUiSchemaTests(unittest.TestCase):
         )
         self.assertEqual(controls["ROW"]["displayLabel"], "ROW")
         self.assertEqual(controls["ADA"]["displayLabel"], "ADA")
+        self.assertEqual(controls["MultiFamilydwellings"]["displayLabel"], "Multifamily Dwellings")
         self.assertEqual(
             MODULE._scenario_group_label(
                 {
@@ -357,6 +359,9 @@ class OptionUiSchemaTests(unittest.TestCase):
             MODULE.display_option_label(internal, "unknown")
 
     def test_approved_staff_facing_cleanup_rules(self):
+        for name in ("MultiFamilydwellings", "Multi Familydwellings", "Multi-Family Dwellings", "Multifamily Dwellings"):
+            with self.subTest(name=name):
+                self.assertEqual(MODULE.clean_staff_facing_label(name), "Multifamily Dwellings")
         self.assertEqual(
             MODULE.clean_staff_facing_label(
                 "Workingwithouta Permit",

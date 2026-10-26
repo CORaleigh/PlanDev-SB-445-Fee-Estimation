@@ -139,34 +139,30 @@ remain subject to staff review until its configured choice is confirmed.
 
 ## Project-Detail Percentages
 
-Queries 122 and 123 reproduce the two earlier broad option studies:
+Generate one query for all options with supported project fields, using the
+complete internal catalog. The default date range is its historical period.
+The generator makes no database or API requests.
 
 ```cmd
-env\Scripts\python.exe scripts\run_query.py queries\122_building_accessory_input_prevalence.sql --all-results --output-dir local-data\building-accessory-prevalence --overwrite --preview-rows 0
+env\Scripts\python.exe scripts\build_option_input_prevalence_query.py output-prod\catalog --all --output local-data\input-prevalence.sql
 ```
 
 ```cmd
-env\Scripts\python.exe scripts\normalize_input_prevalence_results.py local-data\building-accessory-prevalence\result-03.csv --catalog-dir PATH\TO\INTERNAL-CATALOG --permit-type "DSINSP - Building (Non-Residential)" --work-class "Accessory Structure" --output local-data\building_accessory_input_prevalence.csv
+env\Scripts\python.exe scripts\run_query.py local-data\input-prevalence.sql --all-results --output-dir local-data\input-prevalence --preview-rows 0
 ```
 
-```cmd
-env\Scripts\python.exe scripts\run_query.py queries\123_row_occupancy_scenario_prevalence.sql --all-results --output-dir local-data\row-occupancy-prevalence --overwrite --preview-rows 0
-```
+Only the user runs the second command. Result 1 describes the permit cohorts;
+`result-02.csv` is already in the catalog import format. No normalization is
+needed. The query reads source tables and writes only temporary tables.
 
-```cmd
-env\Scripts\python.exe scripts\normalize_input_prevalence_results.py local-data\row-occupancy-prevalence\result-03.csv --catalog-dir PATH\TO\INTERNAL-CATALOG --permit-type "DSENG - Right of Way" --work-class "Right-of-Way Occupancy" --output local-data\row_occupancy_input_prevalence.csv
-```
+Use this single result in `inputPrevalence`, not the three older pilot extracts.
+The refresh requires a row for every supported, display-ready project field.
+An omitted field stops the build. A missing source column or empty cohort stays
+unavailable, and small samples do not receive a numeric percentage.
 
-Generate the electrical query from the released controls instead of keeping a
-permit-specific generated SQL file in the repository:
-
-```cmd
-env\Scripts\python.exe scripts\build_option_input_prevalence_query.py PATH\TO\INTERNAL-CATALOG --permit-type "DSINSP - Electrical (Non-Residential)" --work-class "Alteration/Repairs" --output local-data\electrical_nonres_alteration_input_prevalence.sql
-```
-
-```cmd
-env\Scripts\python.exe scripts\run_query.py local-data\electrical_nonres_alteration_input_prevalence.sql --all-results --output-dir local-data\electrical-prevalence --overwrite --preview-rows 0
-```
+Regenerate and rerun the query when the selected fields change. Existing SQL
+and result files require explicit `--overwrite` to replace them. Queries 122
+and 123 remain available for reviewing the earlier studies.
 
 ## Fee-Assessment Evidence
 

@@ -3440,6 +3440,7 @@ assert.equal(elements.calculate.disabled, true);
             "requiredInputs": [],
         }
         fields = [
+            ["MultiFamilydwellings", "Multi Familydwellings"],
             [
                 "PrivateSewerLFTotal",
                 "PRIVATE IMPROVEMENT QUANTITIES "
@@ -3516,6 +3517,7 @@ assert.equal(elements.calculate.disabled, true);
             )
             self.assertEqual(completed.returncode, 0, completed.stderr)
             labels = json.loads(completed.stdout.strip())
+            self.assertEqual(labels["MultiFamilydwellings"], "Multifamily Dwellings")
             self.assertEqual(
                 labels["PrivateSewerLFTotal"],
                 "Private Sewer Linear Feet",

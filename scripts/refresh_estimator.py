@@ -522,6 +522,7 @@ def main():
         "schema/disclosure-codes.json",
         "--choice-labels",
         inputs["choiceLabels"],
+        "--require-input-prevalence",
     ]
     for path in inputs["inputPrevalence"]:
         command += ["--input-prevalence", path]

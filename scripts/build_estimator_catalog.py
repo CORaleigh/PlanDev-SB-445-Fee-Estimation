@@ -4,13 +4,16 @@ import argparse
 import csv
 import hashlib
 import json
+import math
 import re
 from collections import Counter, defaultdict
+from decimal import Decimal, InvalidOperation
 from datetime import datetime, timezone
 from pathlib import Path
 from uuid import UUID
 
 from fee_assessment_roles import annotate_assessment_roles
+from option_ui_schema import build_option_ui_schema
 
 
 DEFAULT_PERMIT_TEMPLATES = "output-prod/permit_fee_templates_clean.json"
@@ -368,12 +371,20 @@ DIRECT_INPUT_PREVALENCE_DENOMINATOR = "MATURE_ISSUED_OR_FINALIZED"
 
 
 def _csv_int(value):
-    text = str(value or "").strip()
-    return int(text) if text else None
+    text = str(value if value is not None else "").strip()
+    if not text:
+        return None
+    try:
+        number = Decimal(text)
+    except InvalidOperation as error:
+        raise ValueError(f"Expected an integer count, got {text!r}.") from error
+    if not number.is_finite() or number != number.to_integral_value():
+        raise ValueError(f"Expected an integer count, got {text!r}.")
+    return int(number)
 
 
 def _csv_float(value):
-    text = str(value or "").strip()
+    text = str(value if value is not None else "").strip()
     return float(text) if text else None
 
 
@@ -439,6 +450,14 @@ def build_input_prevalence_index(paths):
                 populated_pct = _csv_float(row.get("PopulatedPct"))
                 active_pct = _csv_float(row.get("ActivePct"))
                 denominator = _csv_int(row.get("PermitRows"))
+                populated_rows = _csv_int(row.get("PopulatedRows"))
+                active_rows = _csv_int(row.get("ActiveRows"))
+                for count in (denominator, populated_rows, active_rows):
+                    if count is not None and (count < 0 or (denominator is not None and count > denominator)):
+                        raise ValueError(f"Invalid field-history count for {permit_type} | {work_class} | {input_key}.")
+                for percent in (populated_pct, active_pct):
+                    if percent is not None and (not math.isfinite(percent) or not 0 <= percent <= 100):
+                        raise ValueError(f"Invalid field-history percentage for {permit_type} | {work_class} | {input_key}.")
 
                 result[key] = {
                     "inputKey": input_key,
@@ -449,17 +468,18 @@ def build_input_prevalence_index(paths):
                         "available"
                         if physical_found
                         and denominator is not None
+                        and denominator > 0
                         and active_pct is not None
                         else "unavailable"
                     ),
                     "denominatorName": denominator_name,
                     "denominator": denominator,
-                    "populatedRows": _csv_int(row.get("PopulatedRows")),
+                    "populatedRows": populated_rows,
                     "populatedRate": (
                         populated_pct / 100.0
                         if populated_pct is not None else None
                     ),
-                    "activeRows": _csv_int(row.get("ActiveRows")),
+                    "activeRows": active_rows,
                     "activeRate": (
                         active_pct / 100.0
                         if active_pct is not None else None
@@ -491,6 +511,24 @@ def option_input_prevalence(option, prevalence_index):
         if (permit_type, work_class) == prefix
     ]
     return sorted(rows, key=lambda item: str(item.get("inputKey") or ""))
+
+
+def validate_input_prevalence_coverage(document, prevalence_index):
+    option = document["option"]
+    prefix = (canonical(option["permitType"]), canonical(option["workClass"]))
+    controls = [control for control in build_option_ui_schema(document)["controls"]
+                if control.get("displayReady") and control.get("controlType") in {"number", "boolean", "select"}]
+    missing = [control["key"] for control in controls if (*prefix, control["key"]) not in prevalence_index]
+    if missing:
+        raise ValueError(
+            f"Missing field-history rows for {option['permitType']} / {option['workClass']}: "
+            f"{len(missing)} fields ({', '.join(missing[:3])}). Rerun the all-option field-history query."
+        )
+    kinds = {"number": "numeric", "boolean": "boolean", "select": "choice"}
+    for control in controls:
+        if prevalence_index[(*prefix, control["key"])].get("valueKind") != kinds[control["controlType"]]:
+            raise ValueError(f"Field-history type changed for {option['permitType']} / {option['workClass']} / {control['key']}.")
+    return len(controls)
 
 
 
@@ -1539,6 +1577,7 @@ def build_catalog(
     choice_labels_path=None,
     input_prevalence_paths=None,
     assessment_evidence_paths=None,
+    require_input_prevalence=False,
 ):
     review_document, reviews = load_estimation_review(ESTIMATION_REVIEW_PATH)
     permit_document = load_json(permit_path)
@@ -1678,6 +1717,10 @@ def build_catalog(
             option,
             input_prevalence_index,
         )
+        if require_input_prevalence:
+            summary["inputPrevalenceControlsChecked"] += validate_input_prevalence_coverage(
+                option_document, input_prevalence_index,
+            )
         summary["inputPrevalenceEntries"] += len(
             option_document["inputPrevalence"]
         )
@@ -1793,6 +1836,11 @@ def parse_args():
         ),
     )
     parser.add_argument(
+        "--require-input-prevalence",
+        action="store_true",
+        help="Require a field-history row for every supported display-ready project field, including unavailable rows.",
+    )
+    parser.add_argument(
         "--assessment-evidence",
         action="append",
         default=[],
@@ -1852,6 +1900,7 @@ def main():
         choice_labels_path=input_paths.get("choice labels"),
         input_prevalence_paths=input_prevalence_paths,
         assessment_evidence_paths=assessment_evidence_paths,
+        require_input_prevalence=args.require_input_prevalence,
     )
     print(f"Permit option files:       {summary['options']:,}")
     print(f"Options with history:      {summary['optionsWithHistory']:,}")

@@ -5,6 +5,7 @@ import sys
 import tempfile
 import unittest
 from pathlib import Path
+from unittest.mock import patch
 
 
 SCRIPT = (
@@ -21,6 +22,59 @@ SPEC.loader.exec_module(MODULE)
 
 
 class BuildEstimatorCatalogTests(unittest.TestCase):
+    def test_history_count_parser_accepts_integral_nullable_csv_values(self):
+        self.assertEqual(MODULE._csv_int("100.0"), 100)
+        self.assertEqual(MODULE._csv_int(0), 0)
+        self.assertIsNone(MODULE._csv_int(""))
+        for value in ("1.5", "NaN", "Infinity", "not a count"):
+            with self.subTest(value=value), self.assertRaises(ValueError):
+                MODULE._csv_int(value)
+
+    def test_field_history_coverage_requires_rows_not_invented_percentages(self):
+        doc = {"option": {"permitType": "Permit A", "workClass": "Work A"}}
+        controls = [{"key": "Quantity", "displayReady": True, "controlType": "number"},
+                    {"key": "Choice", "displayReady": True, "controlType": "select"},
+                    {"key": "Hidden", "displayReady": False, "controlType": "select"}]
+        index = {("permit a", "work a", "Quantity"): {"valueKind": "numeric", "status": "available"}}
+        with patch.object(MODULE, "build_option_ui_schema", return_value={"controls": controls}):
+            with self.assertRaisesRegex(ValueError, "Missing field-history rows"):
+                MODULE.validate_input_prevalence_coverage(doc, index)
+            index[("permit a", "work a", "Choice")] = {"valueKind": "choice", "status": "unavailable"}
+            self.assertEqual(MODULE.validate_input_prevalence_coverage(doc, index), 2)
+            index[("permit a", "work a", "Choice")]["valueKind"] = "numeric"
+            with self.assertRaisesRegex(ValueError, "type changed"):
+                MODULE.validate_input_prevalence_coverage(doc, index)
+
+    def test_field_history_distinguishes_zero_usage_from_unavailable(self):
+        base = {"PermitType": "Permit A", "WorkClass": "Work A", "DenominatorName": "MATURE_ISSUED_OR_FINALIZED",
+                "PermitRows": "10.0", "InputKey": "ZeroUsage", "InputLabel": "Quantity", "SourceKind": "custom-saver",
+                "SourceColumn": "Quantity", "ValueKind": "numeric", "PhysicalColumnFound": "1", "PopulatedRows": "10.0",
+                "PopulatedPct": "100", "ActiveRows": "0.0", "ActivePct": "0", "ActiveDefinition": "numeric <> 0"}
+        missing = {**base, "InputKey": "MissingColumn", "PhysicalColumnFound": "0",
+                   "PopulatedRows": "", "PopulatedPct": "", "ActiveRows": "", "ActivePct": ""}
+        empty = {**missing, "InputKey": "EmptyCohort", "PhysicalColumnFound": "1", "PermitRows": "0.0"}
+        with tempfile.TemporaryDirectory() as tmp:
+            path = Path(tmp) / "history.csv"
+            with path.open("w", encoding="utf-8", newline="") as handle:
+                writer = csv.DictWriter(handle, fieldnames=list(base))
+                writer.writeheader()
+                writer.writerows([base, missing, empty])
+            index = MODULE.build_input_prevalence_index([path])
+            zero = index[("permit a", "work a", "ZeroUsage")]
+            self.assertEqual(zero["status"], "available")
+            self.assertEqual(zero["activeRate"], 0)
+            for key in ("MissingColumn", "EmptyCohort"):
+                self.assertEqual(index[("permit a", "work a", key)]["status"], "unavailable")
+                self.assertIsNone(index[("permit a", "work a", key)]["activeRate"])
+            for changes in ({"ActiveRows": "11"}, {"ActivePct": "NaN"}, {"ActivePct": "101"}, {"ActiveRows": "0.5"}):
+                with self.subTest(changes=changes):
+                    with path.open("w", encoding="utf-8", newline="") as handle:
+                        writer = csv.DictWriter(handle, fieldnames=list(base))
+                        writer.writeheader()
+                        writer.writerow({**base, **changes})
+                    with self.assertRaises(ValueError):
+                        MODULE.build_input_prevalence_index([path])
+
     def test_csv_source_kinds_match_schema_and_do_not_invent_dates(self):
         schema_path = SCRIPT.parents[1] / "schema" / "estimator-catalog.schema.json"
         source_schema = json.loads(schema_path.read_text(encoding="utf-8"))["$defs"]["source"]
